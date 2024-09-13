@@ -3,24 +3,21 @@ import { FC, ReactElement, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { Loader2 } from "lucide-react";
-import { ToastWrapper } from "@/components/ui/toast";
-import { toast } from "react-toastify";
+import { useToast } from "@/hooks/use-toast";
+
 export const Login: FC = (): ReactElement => {
   const [isloading, setisLoading] = useState<boolean>(false);
-
+  const { toast } = useToast()
   const handleLoginWithGoogle = async () => {
     setisLoading(true);
     try {
-      const res = await signIn("google");
-      if (res?.ok) {
-        toast.success("Logged in successfully");
-      }
-
-      if (!res?.ok) {
-        toast.error(res?.error);
-      }
+      await signIn("google");
     } catch (error) {
-      toast.error("Something went wrong");
+     toast({
+      variant: "destructive",
+      title: "Uh oh! Something went wrong.",
+      description: "There was a problem with your request."
+     })
     } finally {
       setisLoading(false);
     }
@@ -28,7 +25,6 @@ export const Login: FC = (): ReactElement => {
 
   return (
     <div className="w-full min-h-screen h-full flex justify-center items-center">
-      <ToastWrapper />
       <div className="flex flex-col items-center gap-y-8">
         <h1 className="font-extrabold text-transparent text-7xl p-2 bg-clip-text bg-gradient-to-r from-slate-300 to-slate-500">
           Join with us to get started{" "}
