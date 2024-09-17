@@ -1,8 +1,10 @@
+import { ChatInput } from "@/components/container/chat-input";
+import { MessagesModule } from "@/components/container/messages";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { messageArrayValidator } from "@/entities/schema/message-validator";
 import { fetchRedis } from "@/helpers/redis";
 import { authOptions } from "@/lib/auth";
-import { db } from "@/lib/db";
+
 import { getServerSession } from "next-auth";
 import { notFound } from "next/navigation";
 
@@ -45,7 +47,7 @@ const ChatPage = async ({ params }: Props) => {
   const chatPartner = JSON.parse(chatPartnerRaw) as User;
   const initMessage = await getMessage(chatId);
   return (
-    <section className="flex flex-1 flex-col overflow-hidden">
+    <section className="flex-1 justify-between flex flex-col max-h-[calc(100vh-2rem)]">
       <div className=" flex gap-x-4 items-center w-full py-4 px-8 shadow-md bg-white-400 text-slate-700">
         <figure>
           <Avatar>
@@ -53,10 +55,15 @@ const ChatPage = async ({ params }: Props) => {
             <AvatarFallback>{chatPartner.name[0]}</AvatarFallback>
           </Avatar>
         </figure>
-        <figcaption className="text-base font-semibold">
+        <figcaption className="flex flex-col text-base font-semibold">
+          <span>
           {chatPartner.name}
+          </span>
+          <small className="text-xs font-normal">{chatPartner.email}</small>
         </figcaption>
       </div>
+      <MessagesModule sessionId={session.user.id} initialMessages={initMessage as Message[]}/>
+      <ChatInput chatId={chatId} chatPartner={chatPartner} />
     </section>
   );
 };
