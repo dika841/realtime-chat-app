@@ -10,7 +10,7 @@ export const addFriend = async (
     headers: {
       "Content-Type": "application/json",
     },
-    url: "/api/friends/add",
+    url: "/friends/add",
     data: payload,
   });
   return data;
@@ -21,7 +21,7 @@ export const acceptFriendRequest = async(payload : string):Promise<TFriendRespon
     headers: {
       "Content-Type": "application/json",
     },
-    url: "/api/friends/accept",
+    url: "/friends/accept",
     data: {
       id: payload
     }
@@ -35,7 +35,7 @@ export const declineFriendRequest = async(payload : string):Promise<TFriendRespo
     headers: {
       "Content-Type": "application/json",
     },
-    url: "/api/friends/decline",
+    url: "/friends/decline",
     data: {
       id: payload
     }

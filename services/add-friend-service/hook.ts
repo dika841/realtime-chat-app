@@ -1,6 +1,6 @@
 import { TMetaErrorResponse } from "@/entities/common";
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
-import { acceptFriendRequest, addFriend } from ".";
+import { acceptFriendRequest, addFriend, declineFriendRequest } from ".";
 import { TFriendRequest, TFriendResponse } from "./type";
 export const useAddFriend = (): UseMutationResult<
   TFriendResponse,
@@ -30,6 +30,6 @@ export const useDeclineFriendRequest = (): UseMutationResult<
 > => {
   return useMutation({
     mutationKey: ["decline-friend-request"],
-    mutationFn: async (payload) => await acceptFriendRequest(payload),
+    mutationFn: async (payload) => await declineFriendRequest(payload),
   });
 }

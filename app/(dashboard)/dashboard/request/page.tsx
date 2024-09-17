@@ -25,12 +25,12 @@ const RequestFriendPage: NextPage = async () => {
       }
     })
   )
+  console.log('incomingFriendRequests', incomingFriendRequests);
   return (
     <main className="text-slate-700 p-16 w-full">
       <h1 className="text-3xl font-bold tracking-wide ">Friend Request</h1>
       <FriendRequestModule
-        incomingFriendRequests={incomingFriendRequests}
-        sessionId={session.user.id}
+        incomingFriendRequests={incomingFriendRequests}   
       />
     </main>
   );

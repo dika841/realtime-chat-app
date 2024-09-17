@@ -11,11 +11,10 @@ import { FC, ReactElement, useState } from "react";
 
 interface IFriendRequestProps {
   incomingFriendRequests: IIncomingFriendRequest[];
-  sessionId: string;
+  sessionId?: string;
 }
 export const FriendRequestModule: FC<IFriendRequestProps> = ({
   incomingFriendRequests,
-  sessionId,
 }): ReactElement => {
   const [friendRequest, setFriendRequest] = useState<IIncomingFriendRequest[]>(
     incomingFriendRequests
