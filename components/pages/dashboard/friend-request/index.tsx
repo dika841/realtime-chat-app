@@ -1,13 +1,15 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { pusherClient } from "@/lib/pusher";
+import { toPusherKey } from "@/lib/utils";
 import {
   useAcceptFriendRequest,
   useDeclineFriendRequest,
 } from "@/services/add-friend-service/hook";
 import { Check, CircleX, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FC, ReactElement, useState } from "react";
+import { FC, ReactElement, useEffect, useState } from "react";
 
 interface IFriendRequestProps {
   incomingFriendRequests: IIncomingFriendRequest[];
@@ -15,6 +17,7 @@ interface IFriendRequestProps {
 }
 export const FriendRequestModule: FC<IFriendRequestProps> = ({
   incomingFriendRequests,
+  sessionId,
 }): ReactElement => {
   const [friendRequest, setFriendRequest] = useState<IIncomingFriendRequest[]>(
     incomingFriendRequests
@@ -22,6 +25,26 @@ export const FriendRequestModule: FC<IFriendRequestProps> = ({
   const { mutate: acceptFriendRequest } = useAcceptFriendRequest();
   const { mutate: declineFriendRequest } = useDeclineFriendRequest();
   const router = useRouter();
+
+
+useEffect(()=>{
+  pusherClient.subscribe(toPusherKey(`user:${sessionId}:incoming_friend_requests`))
+  const friendRequestHandler = ({
+    senderId,
+    senderEmail,
+  }: IIncomingFriendRequest) => {
+    console.log("function got called")
+    setFriendRequest((prev) => [...prev, { senderId, senderEmail }])
+  }
+
+  pusherClient.bind('incoming_friend_requests', friendRequestHandler)
+  return () => {
+    pusherClient.unsubscribe(
+      toPusherKey(`user:${sessionId}:incoming_friend_requests`)
+    )
+    pusherClient.unbind('incoming_friend_requests', friendRequestHandler)
+  }
+},[sessionId])
 
   const handleAcceptFriendRequest = (id: string) => {
     acceptFriendRequest(id, {

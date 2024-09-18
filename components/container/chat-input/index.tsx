@@ -16,10 +16,10 @@ interface IChatInputProps {
 
 const FormSchema = z.object({
   text: z.string().min(1, {
-    message: "Bio must be at least 10 characters.",
+    message: "Please enter a message",
   }),
-  chatId: z.string(),
 });
+
 export const ChatInput: FC<IChatInputProps> = ({
   chatPartner,
   chatId,
@@ -31,23 +31,29 @@ export const ChatInput: FC<IChatInputProps> = ({
       text: "",
     },
   });
+
   const onSendMessage = (data: z.infer<typeof FormSchema>) => {
     mutate(
-      { text: data.text, chatId },
+      { text: data.text, chatId }, // Send the correct data
       {
         onSuccess: () => {
           form.reset();
           textareaRef.current?.focus();
         },
+        onError: (error) => {
+          console.error("Error sending message:", error);
+        },
       }
     );
   };
+
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
   return (
     <div className="border-t border-slate-200 px-4 pt-4 mb-2 sm:mb-0">
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSendMessage)}
+          onSubmit={form.handleSubmit(onSendMessage)} 
           className="relative flex-1 overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-slate-500"
         >
           <FormField
@@ -55,18 +61,22 @@ export const ChatInput: FC<IChatInputProps> = ({
             name="text"
             render={({ field }) => (
               <FormItem>
-                <FormControl ref={textareaRef}>
+                <FormControl>
+                
                   <Textarea
+                    ref={textareaRef}
                     placeholder={`Message ${chatPartner.name}`}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
-                        form.handleSubmit(onSendMessage);
+                        form.handleSubmit(onSendMessage)();
                       }
                     }}
                     rows={1}
                     className="block py-2 w-full outline-none resize-none border-0 bg-transparent shadow-none text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 sm:py-1.5 sm:text-sm sm:leading-6"
-                    {...field}
+                    value={field.value}
+                    onChange={field.onChange} 
+                    onBlur={field.onBlur} 
                   />
                 </FormControl>
               </FormItem>
@@ -82,11 +92,12 @@ export const ChatInput: FC<IChatInputProps> = ({
             </div>
           </div>
           <div className="absolute right-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
-            <div className="flex-shrin-0">
+            <div className="flex-shrink-0">
               <Button
                 type="submit"
                 size={"default"}
                 className="text-center bg-slate-600"
+                disabled={isPending} 
               >
                 {isPending ? <Loader2 /> : <SendHorizontal />}
               </Button>

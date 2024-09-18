@@ -26,7 +26,7 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
     )) as User[]
   ).length
   return (
-    <section className="w-full flex max-w-[1440px] bg-slate-50 min-h-screen">
+    <main className="w-full flex max-w-[1440px] bg-slate-50 min-h-screen">
       <Sidebar
         email={session?.user?.email as string}
         name={session?.user?.name as string}
@@ -35,8 +35,10 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
         sessionId={session?.user?.id}
         initFriendRequestCount={unseenRequestCount}
       />
-      {children}
-    </section>
+     <section className='max-h-screen container py-16 md:py-12 w-full'>
+        {children}
+      </section>
+    </main>
   );
 };
 

@@ -24,14 +24,17 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { addFriendSchema } from "@/entities/schema/email-validator";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { TSidebar } from "./type";
+import { ExtendedMessage, TSidebar } from "./type";
 import { Loader2, Send, UserPlus, Users, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useAddFriend } from "@/services/add-friend-service/hook";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { chatHrefConstructor } from "@/lib/utils";
+import { chatHrefConstructor, toPusherKey } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { pusherClient } from "@/lib/pusher";
+import { ToastAction } from "@/components/ui/toast";
+import Image from "next/image";
 export const Sidebar: FC<TSidebar> = ({
   email,
   name,
@@ -56,6 +59,96 @@ export const Sidebar: FC<TSidebar> = ({
   });
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+    pusherClient.subscribe(
+      toPusherKey(`user:${sessionId}:incoming_friend_requests`)
+    );
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:friends`));
+
+    const friendRequestHandler = () => {
+      setFriendRequestCount((prev) => prev + 1);
+    };
+
+    const addedFriendHandler = () => {
+      setFriendRequestCount((prev) => prev - 1);
+    };
+
+    pusherClient.bind("incoming_friend_requests", friendRequestHandler);
+    pusherClient.bind("new_friend", addedFriendHandler);
+
+    return () => {
+      pusherClient.unsubscribe(
+        toPusherKey(`user:${sessionId}:incoming_friend_requests`)
+      );
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:friends`));
+
+      pusherClient.unbind("new_friend", addedFriendHandler);
+      pusherClient.unbind("incoming_friend_requests", friendRequestHandler);
+    };
+  }, [sessionId]);
+
+  useEffect(() => {
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:chats`));
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:friends`));
+
+    const newFriendHandler = (newFriend: User) => {
+      console.log("received new user", newFriend);
+      setActiveChats((prev) => [...prev, newFriend]);
+    };
+    const chatHandler = (message: ExtendedMessage) => {
+      const shouldNotify =
+        pathname !==
+        `/dashboard/chat/${chatHrefConstructor(
+          sessionId as string,
+          message.senderId
+        )}`;
+
+      if (!shouldNotify) return;
+
+      toast({
+        title: "New Message",
+        description: (
+          <div className="max-w-[250px]">
+            <strong>{message.senderName}</strong> has sent you a new message
+            <p className="truncate overflow-hidden text-ellipsis whitespace-nowrap">
+              {message.text}
+            </p>
+          </div>
+        ),
+        variant: "subtle",
+        action: (
+          <ToastAction
+            altText="Go to message"
+            onClick={() =>
+              router.push(
+                `/dashboard/chat/${chatHrefConstructor(
+                  sessionId as string,
+                  message.senderId
+                )}`
+              )
+            }
+          >
+            Go to message
+          </ToastAction>
+        ),
+        key: message.senderId,
+      });
+
+      setUnseenMessages((prev) => [...prev, message]);
+    };
+
+    pusherClient.bind("new_message", chatHandler);
+    pusherClient.bind("new_friend", newFriendHandler);
+
+    return () => {
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:chats`));
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:friends`));
+
+      pusherClient.unbind("new_message", chatHandler);
+      pusherClient.unbind("new_friend", newFriendHandler);
+    };
+  }, [pathname, router, sessionId, toast]);
   const onSubmit = (values: z.infer<typeof addFriendSchema>) => {
     addFriend(values, {
       onSuccess: () => {
@@ -165,46 +258,60 @@ export const Sidebar: FC<TSidebar> = ({
               <Users size={20} />
               Friend request
             </div>
-            {friednRequestCount > 0 && (
+            {friednRequestCount > 0 ? (
               <span
-                className="text-xs font-semibold ml-4 bg-red-600
+                className="text-xs font-semibold ml-2 bg-red-600
             text-slate-50 rounded-full size-5 flex justify-center items-center "
               >
                 {friednRequestCount}
               </span>
-            )}
+            ) : null}
           </Link>
         </div>
         <section className="mt-2">
-          <h3 className="text-sm font-semibold">Chats</h3>
-          <ScrollArea className="h-60 w-full rounded-md border text-slate-800">
-            <ul>
-              {friends?.sort().map((friend) => {
-                const unseenMessagesCount = unseenMessages.filter(
-                  (unseenMsg) => {
-                    return unseenMsg.senderId === friend.id;
-                  }
-                ).length;
+          <h3 className="text-sm font-semibold">Your Chats</h3>
+          <ScrollArea className="h-60 w-full  text-slate-800 p-2">
+            <ul className="flex flex-col gap-2 ">
+              {activeChats
+                .sort()
+                ?.sort()
+                .map((friend) => {
+                  const unseenMessagesCount = unseenMessages.filter(
+                    (unseenMsg) => {
+                      return unseenMsg.senderId === friend.id;
+                    }
+                  ).length;
 
-                return (
-                  <li key={friend.id}>
-                    <a
-                      href={`/dashboard/chat/${chatHrefConstructor(
-                        sessionId as string,
-                        friend.id
-                      )}`}
-                      className="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold"
+                  return (
+                    <li
+                      key={friend.id}
+                      className="flex items-center group px-2 shadow-sm"
                     >
-                      {friend.name}
-                      {unseenMessagesCount > 0 ? (
-                        <div className="bg-indigo-600 font-medium text-xs text-white w-4 h-4 rounded-full flex justify-center items-center">
-                          {unseenMessagesCount}
+                      <Link
+                        href={`/dashboard/chat/${chatHrefConstructor(
+                          sessionId as string,
+                          friend.id
+                        )}`}
+                        className="w-full text-gray-700 group-hover:text-slate-600 group-hover:bg-gray-50 group flex items-center gap-x-3 p-2 text-sm leading-6 font-semibold py-2"
+                      >
+                        <div className="relative size-6">
+                          <Image
+                            fill
+                            src={friend.image}
+                            alt="profile"
+                            className="rounded-full"
+                          />
                         </div>
-                      ) : null}
-                    </a>
-                  </li>
-                );
-              })}
+                        <span>{friend.name}</span>
+                        {unseenMessagesCount > 0 ? (
+                          <div className="bg-red-500 font-medium text-xs text-white w-4 h-4 rounded-full flex justify-center items-center">
+                            {unseenMessagesCount}
+                          </div>
+                        ) : null}
+                      </Link>
+                    </li>
+                  );
+                })}
             </ul>
           </ScrollArea>
         </section>
