@@ -1,7 +1,10 @@
 import { api } from "../api";
-import { TSendMessage } from "./type";
+import { TSendMessage, TSendMessageResponse } from "./type";
 
-export const sendMessageMutation = async ({ text, chatId }: TSendMessage):Promise<TSendMessage> => {
-    const {data} = await api.post('/api/message/send', { text, chatId });
-    return data;
+export const sendMessageMutation = async ({
+  text,
+  chatId,
+}: TSendMessage): Promise<TSendMessageResponse> => {
+  const { data } = await api.post("/message/send", { text, chatId });
+  return data;
 };

@@ -89,4 +89,37 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+  container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8
+  }
+}
+.scrollbar-w-2::-webkit-scrollbar {
+  width: 0.4rem;
+  height: 0.4rem;
+}
+
+.scrollbar-track-blue-lighter::-webkit-scrollbar-track {
+  background-color: #e9ecef; 
+  border-radius: 10px; 
+}
+
+.scrollbar-thumb-blue::-webkit-scrollbar-thumb {
+  background-color: #495057; 
+  border-radius: 10px; 
+  border: 2px solid #e9ecef; 
+}
+
+.scrollbar-thumb-rounded::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+}
+
+
+.scrollbar-thumb-blue::-webkit-scrollbar-thumb:hover {
+  background-color: #343a40; 
+  transition: background-color 0.3s ease;
+}
+
+.scrollbar-thumb-blue::-webkit-scrollbar-thumb:active {
+  background-color: #212529; 
+  transition: background-color 0.2s ease;
 }

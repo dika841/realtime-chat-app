@@ -15,24 +15,26 @@ const RequestFriendPage: NextPage = async () => {
   )) as string[];
   const incomingFriendRequests = await Promise.all(
     incomingSenderId.map(async (senderId) => {
-      const sender = (await fetchRedis('get', `user:${senderId}`)) as string
-      const senderParsed = JSON.parse(sender) as User  
+      const sender = (await fetchRedis("get", `user:${senderId}`)) as string;
+      const senderParsed = JSON.parse(sender) as User;
       return {
         senderId,
         senderEmail: senderParsed.email,
         senderImage: senderParsed.image,
         senderName: senderParsed.name,
-      }
+      };
     })
-  )
-  console.log('incomingFriendRequests', incomingFriendRequests);
+  );
+
   return (
-    <main className="text-slate-700 p-16 w-full">
+    <div className="text-slate-700 flex-1 flex flex-col">
       <h1 className="text-3xl font-bold tracking-wide ">Friend Request</h1>
       <FriendRequestModule
-        incomingFriendRequests={incomingFriendRequests}   
+        incomingFriendRequests={incomingFriendRequests}
+        sessionId={session.user.id}
       />
-    </main>
+     
+    </div>
   );
 };
 

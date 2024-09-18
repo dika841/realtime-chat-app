@@ -47,24 +47,24 @@ const ChatPage = async ({ params }: Props) => {
   const chatPartner = JSON.parse(chatPartnerRaw) as User;
   const initMessage = await getMessage(chatId);
   return (
-    <section className="flex-1 justify-between flex flex-col max-h-[calc(100vh-2rem)]">
-      <div className=" flex gap-x-4 items-center w-full py-4 px-8 shadow-md bg-white-400 text-slate-700">
+    <div className="flex-1 h-full justify-between flex flex-col max-h-[calc(100vh-6rem)]">
+      <div className=" flex gap-x-4 items-center w-full py-4 px-8  border-b border-slate-200 bg-white-400 text-slate-700">
         <figure>
           <Avatar>
             <AvatarImage src={chatPartner.image} />
             <AvatarFallback>{chatPartner.name[0]}</AvatarFallback>
           </Avatar>
         </figure>
-        <figcaption className="flex flex-col text-base font-semibold">
+        <div className="flex flex-col text-base font-semibold">
           <span>
           {chatPartner.name}
           </span>
           <small className="text-xs font-normal">{chatPartner.email}</small>
-        </figcaption>
+        </div>
       </div>
-      <MessagesModule sessionId={session.user.id} initialMessages={initMessage as Message[]}/>
+      <MessagesModule chatId={chatId} sessionImg={session?.user?.image} chatPartner={chatPartner} sessionId={session.user.id} initialMessages={initMessage as Message[]}/>
       <ChatInput chatId={chatId} chatPartner={chatPartner} />
-    </section>
+    </div>
   );
 };
 export default ChatPage;
