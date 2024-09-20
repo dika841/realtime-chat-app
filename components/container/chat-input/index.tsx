@@ -99,7 +99,7 @@ export const ChatInput: FC<IChatInputProps> = ({
                 className="text-center bg-slate-600"
                 disabled={isPending} 
               >
-                {isPending ? <Loader2 /> : <SendHorizontal />}
+                {isPending ? <Loader2 /> : <SendHorizontal size={16}/>}
               </Button>
             </div>
           </div>
