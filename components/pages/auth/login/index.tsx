@@ -24,10 +24,10 @@ export const Login: FC = (): ReactElement => {
   };
 
   return (
-    <div className="w-full min-h-screen h-full flex justify-center items-center">
+    <div className="container w-full min-h-screen h-full flex justify-center items-center">
       <div className="flex flex-col items-center gap-y-8">
-        <h1 className="font-extrabold text-transparent text-7xl p-2 bg-clip-text bg-gradient-to-r from-slate-300 to-slate-500">
-          Join with us to get started{" "}
+        <h1 className="text-4xl text-center mdLtext-start font-extrabold text-transparent md:text-7xl bg-clip-text bg-gradient-to-r from-slate-300 to-slate-500">
+        Connect with your friends using <i>Connectify</i> 
         </h1>
         <Button
           variant="secondary"

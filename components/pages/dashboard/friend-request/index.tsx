@@ -1,6 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { pusherClient } from "@/lib/pusher";
 import { toPusherKey } from "@/lib/utils";
 import {
@@ -22,6 +23,7 @@ export const FriendRequestModule: FC<IFriendRequestProps> = ({
   const [friendRequest, setFriendRequest] = useState<IIncomingFriendRequest[]>(
     incomingFriendRequests
   );
+  const {toast} = useToast()
   const { mutate: acceptFriendRequest } = useAcceptFriendRequest();
   const { mutate: declineFriendRequest } = useDeclineFriendRequest();
   const router = useRouter();
@@ -52,6 +54,11 @@ useEffect(()=>{
         setFriendRequest((prev) =>
           prev.filter((request) => request.senderId !== id)
         );
+        toast({
+          title: "Friend Request Accepted",
+          description: "You have accepted your friend request",
+          variant: "success",
+        })
         router.refresh();
       },
     });
@@ -63,6 +70,11 @@ useEffect(()=>{
         setFriendRequest((prev) =>
           prev.filter((request) => request.senderId !== id)
         );
+        toast({
+          title: "Friend Request Declined",
+          description: "You have declined your friend request",
+          variant: "success",
+        })
         router.refresh();
       },
     });
