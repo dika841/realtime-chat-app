@@ -26,7 +26,7 @@ const Layout: FC<LayoutProps> = async ({ children }) => {
     )) as User[]
   ).length
   return (
-    <main className="w-full flex max-w-[1440px] bg-slate-50 min-h-screen">
+    <main className="w-full flex bg-slate-50 min-h-screen">
       <Sidebar
         email={session?.user?.email as string}
         name={session?.user?.name as string}

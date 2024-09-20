@@ -187,7 +187,7 @@ export const Sidebar: FC<TSidebar> = ({
   return (
     <>
      {/* mobile sidebar start */}
-      <div className="md:hidden w-full p-4 fixed top-0 flex items-center justify-between bg-slate-400">
+      <div className="md:hidden w-full p-4 fixed top-0 flex items-center justify-between bg-slate-400 z-50">
         <div className="flex items-center gap-x-2">
           <Link
             href={"/"}
@@ -218,6 +218,7 @@ export const Sidebar: FC<TSidebar> = ({
           <Link
             href={"/"}
             className="text-2xl font-bold tracking-wide italic cursor-pointer"
+            onClick={() => setIsNavopen(false)}
           >
             Connectify
           </Link>
@@ -290,6 +291,7 @@ export const Sidebar: FC<TSidebar> = ({
             <Link
               href={"/dashboard/request"}
               className={buttonVariants({ variant: "ghost", size: "default" })}
+              onClick={() => setIsNavopen(false)}
             >
               <div className="flex items-center gap-x-2">
                 <Users size={20} />
@@ -323,6 +325,7 @@ export const Sidebar: FC<TSidebar> = ({
                       <li
                         key={friend.id}
                         className="flex items-center group px-2 shadow-sm"
+                        onClick={() => setIsNavopen(false)}
                       >
                         <Link
                           href={`/dashboard/chat/${chatHrefConstructor(

@@ -28,7 +28,7 @@ const RequestFriendPage: NextPage = async () => {
 
   return (
     <div className="text-slate-700 flex-1 flex flex-col">
-      <h1 className="text-3xl font-bold tracking-wide ">Friend Request</h1>
+      <h1 className="text-3xl font-bold tracking-wide mt-4 md:mt-0">Friend Request</h1>
       <FriendRequestModule
         incomingFriendRequests={incomingFriendRequests}
         sessionId={session.user.id}

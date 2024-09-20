@@ -81,14 +81,14 @@ useEffect(()=>{
   };
 
   return (
-    <div className="flex flex-col gap-y-2 bg-white w-5/6 p-2 min-h-40 h-auto rounded-lg mt-8 mx-auto shadow-md">
+    <div className="flex flex-col gap-y-2 bg-white w-full md:w-5/6 p-2 min-h-40 h-auto rounded-lg mt-8 mx-auto shadow-md">
       {friendRequest?.length === 0 ? (
         <p className="text-center font-semibold">No friend requests</p>
       ) : (
         friendRequest?.map((request) => (
           <div
             key={request.senderId}
-            className="flex items-center justify-between shadow-md rounded-lg p-2 hover:bg-slate-50"
+            className="flex items-center justify-between shadow-md rounded-lg p-2 hover:bg-slate-50 "
           >
             <div className="flex items-center gap-x-4">
               <Avatar>
@@ -102,7 +102,7 @@ useEffect(()=>{
                 <small className="text-xs">{request.senderEmail}</small>
               </div>
             </div>
-            <div className="space-x-4">
+            <div className="space-x-3">
               <Button
                 aria-label="accept"
                 title="Accept friend request"
@@ -110,7 +110,7 @@ useEffect(()=>{
                 size={"sm"}
                 onClick={() => handleAcceptFriendRequest(request.senderId)}
               >
-                <Check />
+                <Check size={16}/>
               </Button>
               <Button
                 aria-label="decline"
@@ -119,7 +119,7 @@ useEffect(()=>{
                 size={"sm"}
                 onClick={() => handleDeclineFriendRequest(request.senderId)}
               >
-                <CircleX />
+                <CircleX size={16}/>
               </Button>
             </div>
           </div>
